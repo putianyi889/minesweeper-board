@@ -30,6 +30,19 @@
                 <BoardForeground v-if="props.board !== undefined" />
             </slot>
         </div>
+        <div
+            v-if="props.cursorPosition !== undefined"
+            class="minesweeper-board-layer minesweeper-board-layer--cursor"
+            :style="cursorStyle"
+        >
+            <slot
+                name="cursor"
+                :position="props.cursorPosition"
+                :size="effectiveSize"
+            >
+                <div class="minesweeper-board-cursor" />
+            </slot>
+        </div>
     </div>
 </template>
 
@@ -44,6 +57,10 @@ type CellIndex = {
     rowIndex: number
     columnIndex: number
 }
+type CursorPosition = {
+    rowIndex: number
+    columnIndex: number
+}
 type BoardSize = number | 'auto'
 
 const props = defineProps({
@@ -54,6 +71,14 @@ const props = defineProps({
         type: [Number, String] as PropType<BoardSize>,
         required: true,
         validator: (size: BoardSize) => size === 'auto' || typeof size === 'number',
+    },
+    /** Cursor position in cell units. Fractional values place the cursor between cells. */
+    cursorPosition: {
+        type: Object as PropType<CursorPosition>,
+        default: undefined,
+        validator: (position: CursorPosition) => {
+            return Number.isFinite(position.rowIndex) && Number.isFinite(position.columnIndex)
+        },
     },
 })
 
@@ -84,6 +109,18 @@ provide(minesweeperBoardKey, {
 
 const boardWidth = computed(() => columnCount.value * effectiveSize.value)
 const boardHeight = computed(() => rowCount.value * effectiveSize.value)
+const cursorStyle = computed(() => {
+    const position = props.cursorPosition
+    if (position === undefined) {
+        return {}
+    }
+
+    return {
+        '--minesweeper-cursor-size': `${effectiveSize.value}px`,
+        '--minesweeper-cursor-x': `${position.columnIndex * effectiveSize.value}px`,
+        '--minesweeper-cursor-y': `${position.rowIndex * effectiveSize.value}px`,
+    }
+})
 
 function clearCellIndex() {
     if (cellIndex.value === undefined) {
@@ -207,5 +244,23 @@ defineExpose({ cellIndex })
 
 .minesweeper-board-layer--foreground {
     pointer-events: none;
+}
+
+.minesweeper-board-layer--cursor {
+    height: 0;
+    pointer-events: none;
+    transform: translate(var(--minesweeper-cursor-x), var(--minesweeper-cursor-y));
+    width: 0;
+    z-index: 1;
+}
+
+.minesweeper-board-cursor {
+    background: #ffdf00;
+    border: calc(var(--minesweeper-cursor-size) * 0.0625) solid #000000;
+    border-radius: 50%;
+    box-sizing: border-box;
+    height: calc(var(--minesweeper-cursor-size) * 0.375);
+    transform: translate(-50%, -50%);
+    width: calc(var(--minesweeper-cursor-size) * 0.375);
 }
 </style>

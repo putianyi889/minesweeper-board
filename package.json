@@ -1,6 +1,6 @@
 {
   "name": "@putianyi888/vue3-minesweeper-board",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Vue 3 Minesweeper board component for ms_toollib game board values.",
   "type": "module",
   "license": "MIT",
