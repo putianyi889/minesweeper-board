@@ -5,6 +5,10 @@
   "type": "module",
   "license": "MIT",
   "author": "Tianyi Pu",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/putianyi889/minesweeper-board"
+  },
   "main": "./dist/minesweeper-board.umd.cjs",
   "module": "./dist/minesweeper-board.js",
   "style": "./dist/minesweeper-board.css",
