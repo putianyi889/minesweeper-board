@@ -36,12 +36,13 @@
     "pack:dry-run": "npm pack --dry-run"
   },
   "peerDependencies": {
-    "@putianyi888/vue3-plots": "^0.6.0",
     "vue": "^3.5.0"
+  },
+  "dependencies": {
+    "@putianyi888/vue3-plots": "^0.6.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@putianyi888/vue3-plots": "^0.6.0",
     "@types/node": "^26.1.1",
     "@vitejs/plugin-vue": "^6.0.8",
     "@vitest/coverage-v8": "^4.1.10",
