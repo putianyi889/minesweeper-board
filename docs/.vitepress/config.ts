@@ -5,6 +5,7 @@ import wasm from 'vite-plugin-wasm'
 export default defineConfig({
   title: 'minesweeper-board',
   description: 'Vue 3 Minesweeper board component.',
+  base: process.env.VITEPRESS_BASE ?? '/',
   vite: {
     build: {
       target: 'esnext',
