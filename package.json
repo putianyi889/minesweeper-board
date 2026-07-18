@@ -31,6 +31,7 @@
     "lint:fix": "eslint . --fix",
     "prepack": "npm run build",
     "test": "vitest run",
+    "coverage": "vitest run --coverage",
     "typecheck": "vue-tsc --noEmit",
     "pack:dry-run": "npm pack --dry-run"
   },
@@ -43,6 +44,7 @@
     "@putianyi888/vue3-plots": "^0.6.0",
     "@types/node": "^26.1.1",
     "@vitejs/plugin-vue": "^6.0.8",
+    "@vitest/coverage-v8": "^4.1.10",
     "@vue/test-utils": "^2.4.11",
     "eslint": "^10.7.0",
     "eslint-plugin-vue": "^10.9.2",
