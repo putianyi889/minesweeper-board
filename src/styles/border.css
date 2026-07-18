@@ -1,0 +1,21 @@
+.outer-border {
+    align-items: flex-start;
+    background: #c0c0c0;
+    border-color: #ffffff #a0a0a0 #a0a0a0 #ffffff;
+    border-style: solid;
+    border-width: 0.1875em;
+    box-sizing: border-box;
+    display: inline-flex;
+    gap: 0.375em;
+    line-height: 0;
+    margin: 0;
+    padding: 0.375em;
+}
+
+.inner-border {
+    border-color: #808080 #ffffff #ffffff #808080;
+    border-style: solid;
+    border-width: 0.1875em;
+    box-sizing: content-box;
+    font-size: inherit;
+}

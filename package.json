@@ -1,0 +1,64 @@
+{
+  "name": "@putianyi888/vue3-minesweeper-board",
+  "version": "0.1.0",
+  "description": "Vue 3 Minesweeper board component for ms_toollib game board values.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Tianyi Pu",
+  "main": "./dist/minesweeper-board.umd.cjs",
+  "module": "./dist/minesweeper-board.js",
+  "style": "./dist/minesweeper-board.css",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/minesweeper-board.js",
+      "require": "./dist/minesweeper-board.umd.cjs"
+    },
+    "./style.css": "./dist/minesweeper-board.css"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "vue-tsc --noEmit && vite build",
+    "docs:build": "vitepress build docs",
+    "docs:dev": "vitepress dev docs",
+    "docs:preview": "vitepress preview docs",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prepack": "npm run build",
+    "test": "vitest run",
+    "typecheck": "vue-tsc --noEmit",
+    "pack:dry-run": "npm pack --dry-run"
+  },
+  "peerDependencies": {
+    "@putianyi888/vue3-plots": "^0.6.0",
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@putianyi888/vue3-plots": "^0.6.0",
+    "@types/node": "^26.1.1",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "@vue/test-utils": "^2.4.11",
+    "eslint": "^10.7.0",
+    "eslint-plugin-vue": "^10.9.2",
+    "globals": "^17.7.0",
+    "jsdom": "^29.1.1",
+    "ms-toollib": "^1.5.15",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.64.0",
+    "vite": "^8.1.5",
+    "vite-plugin-dts": "^5.0.3",
+    "vite-plugin-top-level-await": "^1.6.0",
+    "vite-plugin-wasm": "^3.6.0",
+    "vitepress": "^1.6.4",
+    "vitest": "^4.1.10",
+    "vue": "^3.5.40",
+    "vue-eslint-parser": "^10.4.1",
+    "vue-tsc": "^3.3.7"
+  }
+}
