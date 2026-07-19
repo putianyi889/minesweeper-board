@@ -41,7 +41,8 @@ jobs:
         run: npm run coverage
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v6
+        if: github.actor != 'dependabot[bot]' && github.actor != 'dependabot-preview[bot]'
+        uses: codecov/codecov-action@v7
         with:
           fail_ci_if_error: true
           files: ./coverage/lcov.info
