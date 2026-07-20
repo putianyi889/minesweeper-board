@@ -1,10 +1,14 @@
 {
   "name": "@putianyi888/vue3-minesweeper-board",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "Vue 3 Minesweeper board component for ms_toollib game board values.",
   "type": "module",
   "license": "MIT",
   "author": "Tianyi Pu",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/putianyi889/minesweeper-board"
+  },
   "main": "./dist/minesweeper-board.umd.cjs",
   "module": "./dist/minesweeper-board.js",
   "style": "./dist/minesweeper-board.css",
@@ -36,16 +40,18 @@
     "pack:dry-run": "npm pack --dry-run"
   },
   "peerDependencies": {
-    "@putianyi888/vue3-plots": "^0.6.0",
     "vue": "^3.5.0"
+  },
+  "dependencies": {
+    "@putianyi888/vue3-plots": "^0.6.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@putianyi888/vue3-plots": "^0.6.0",
     "@types/node": "^26.1.1",
     "@vitejs/plugin-vue": "^6.0.8",
     "@vitest/coverage-v8": "^4.1.10",
     "@vue/test-utils": "^2.4.11",
+    "esbuild": "^0.28.1",
     "eslint": "^10.7.0",
     "eslint-plugin-vue": "^10.9.2",
     "globals": "^17.7.0",

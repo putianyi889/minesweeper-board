@@ -1,12 +1,11 @@
 # @putianyi888/vue3-minesweeper-board
 
-Vue 3 component for rendering a Minesweeper board matrix using
-`@putianyi888/vue3-plots`.
+Vue 3 component for rendering a Minesweeper board matrix.
 
 ## Install
 
 ```sh
-npm install @putianyi888/vue3-minesweeper-board @putianyi888/vue3-plots vue
+npm install @putianyi888/vue3-minesweeper-board vue
 ```
 
 ## Usage
