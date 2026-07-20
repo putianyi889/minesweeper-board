@@ -47,6 +47,48 @@ describe('MinesweeperBoard', () => {
         expect(wrapper.find('[data-layer="border"]').exists()).toBe(false)
     })
 
+    it('renders the default cursor from a cell-unit position', () => {
+        const wrapper = shallowMount(MinesweeperBoard, {
+            props: {
+                board: [
+                    [10, 10, 10],
+                    [10, 10, 10],
+                ],
+                cursorPosition: { rowIndex: 1.5, columnIndex: 2 },
+                size: 20,
+            },
+        })
+        const cursorLayer = wrapper.find('.minesweeper-board-layer--cursor')
+
+        expect(cursorLayer.exists()).toBe(true)
+        expect((cursorLayer.element as HTMLElement).style.getPropertyValue('--minesweeper-cursor-x')).toBe('40px')
+        expect((cursorLayer.element as HTMLElement).style.getPropertyValue('--minesweeper-cursor-y')).toBe('30px')
+        expect((cursorLayer.element as HTMLElement).style.getPropertyValue('--minesweeper-cursor-size')).toBe('20px')
+        expect(wrapper.find('.minesweeper-board-cursor').exists()).toBe(true)
+    })
+
+    it('allows a custom cursor slot', () => {
+        const wrapper = shallowMount(MinesweeperBoard, {
+            props: {
+                board: [[10]],
+                cursorPosition: { rowIndex: 0.25, columnIndex: 0.75 },
+                size: 16,
+            },
+            slots: {
+                cursor: ({ position, size }) => h('span', {
+                    'data-column': String(position.columnIndex),
+                    'data-row': String(position.rowIndex),
+                    'data-size': String(size),
+                }),
+            },
+        })
+
+        expect(wrapper.find('[data-row]').attributes('data-row')).toBe('0.25')
+        expect(wrapper.find('[data-column]').attributes('data-column')).toBe('0.75')
+        expect(wrapper.find('[data-size]').attributes('data-size')).toBe('16')
+        expect(wrapper.find('.minesweeper-board-cursor').exists()).toBe(false)
+    })
+
     it('fits auto size to the parent container', async () => {
         const observe = vi.fn()
         const disconnect = vi.fn()
