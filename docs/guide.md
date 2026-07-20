@@ -3,7 +3,7 @@
 ## Install
 
 ```sh
-npm install @putianyi888/vue3-minesweeper-board @putianyi888/vue3-plots vue
+npm install @putianyi888/vue3-minesweeper-board vue
 ```
 
 ## Usage
