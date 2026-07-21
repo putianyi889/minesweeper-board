@@ -422,10 +422,10 @@ describe('MinesweeperBoard', () => {
         expect(canvasContext.fillText).toHaveBeenNthCalledWith(3, '100', 10, 30)
         expect(canvasContext.fillText).toHaveBeenNthCalledWith(4, '13', 30, 30)
         expect(canvasContext.fonts).toEqual([
-            '9.6px sans-serif',
-            '9.6px sans-serif',
+            '10.8px sans-serif',
+            '10.8px sans-serif',
             '8.4px sans-serif',
-            '9.6px sans-serif',
+            '10.8px sans-serif',
         ])
         expect(color).toHaveBeenCalledWith(1, 1, 0)
 
