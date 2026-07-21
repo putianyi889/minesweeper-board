@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitepress'
+import { fileURLToPath, URL } from 'node:url'
 import topLevelAwait from 'vite-plugin-top-level-await'
 import wasm from 'vite-plugin-wasm'
 
@@ -7,6 +8,18 @@ export default defineConfig({
   description: 'Vue 3 Minesweeper board component.',
   base: process.env.VITEPRESS_BASE ?? '/',
   vite: {
+    resolve: {
+      alias: [
+        {
+          find: '@putianyi888/vue3-minesweeper-board/style.css',
+          replacement: fileURLToPath(new URL('../../src/styles/border.css', import.meta.url)),
+        },
+        {
+          find: '@putianyi888/vue3-minesweeper-board',
+          replacement: fileURLToPath(new URL('../../src/index.ts', import.meta.url)),
+        },
+      ],
+    },
     build: {
       target: 'esnext',
     },
