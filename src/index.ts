@@ -2,6 +2,7 @@ import './styles/border.css'
 
 export { default as BoardBackground } from './components/BoardBackground.vue'
 export { default as BoardForeground } from './components/BoardForeground.vue'
+export { default as BoardProbability } from './components/BoardProbability.vue'
 export { default as Counter } from './components/Counter.vue'
 export { default as MinesweeperBoard } from './components/MinesweeperBoard.vue'
 export { default } from './components/MinesweeperBoard.vue'

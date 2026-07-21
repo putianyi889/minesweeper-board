@@ -1,10 +1,11 @@
 import { shallowMount } from '@vue/test-utils'
 import { ImageGrid } from '@putianyi888/vue3-plots'
-import { computed, h, nextTick } from 'vue'
+import { computed, h, nextTick, ref } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
 import BoardBackground from '../../src/components/BoardBackground.vue'
 import BoardForeground from '../../src/components/BoardForeground.vue'
+import BoardProbability from '../../src/components/BoardProbability.vue'
 import Counter from '../../src/components/Counter.vue'
 import MinesweeperBoard from '../../src/components/MinesweeperBoard.vue'
 import { minesweeperBoardKey } from '../../src/components/context'
@@ -386,4 +387,168 @@ describe('MinesweeperBoard', () => {
             ['falsemine', 'blast', 'mine', 'blank', 'blank'],
         ])
     })
+
+    it('renders probability values as percentage text on canvas', async () => {
+        const canvasContext = createCanvasContext()
+        const getContext = vi.spyOn(HTMLCanvasElement.prototype, 'getContext')
+            .mockReturnValue(canvasContext as unknown as CanvasRenderingContext2D)
+        const color = vi.fn((value: number) => (value > 0.5 ? '#ff0000' : '#000000'))
+
+        const wrapper = shallowMount(BoardProbability, {
+            props: {
+                board: [
+                    [0, 0.5],
+                    [1, 0.125],
+                ],
+                color,
+            },
+            global: {
+                provide: {
+                    [minesweeperBoardKey as symbol]: {
+                        board: computed(() => undefined),
+                        size: computed(() => 20),
+                    },
+                },
+            },
+        })
+
+        await nextTick()
+
+        expect(wrapper.find('canvas').attributes('width')).toBe('40')
+        expect(wrapper.find('canvas').attributes('height')).toBe('40')
+        expect(canvasContext.fillText).toHaveBeenCalledTimes(4)
+        expect(canvasContext.fillText).toHaveBeenNthCalledWith(1, '0', 10, 10)
+        expect(canvasContext.fillText).toHaveBeenNthCalledWith(2, '50', 30, 10)
+        expect(canvasContext.fillText).toHaveBeenNthCalledWith(3, '100', 10, 30)
+        expect(canvasContext.fillText).toHaveBeenNthCalledWith(4, '13', 30, 30)
+        expect(canvasContext.fonts).toEqual([
+            '9.6px sans-serif',
+            '9.6px sans-serif',
+            '8.4px sans-serif',
+            '9.6px sans-serif',
+        ])
+        expect(color).toHaveBeenCalledWith(1, 1, 0)
+
+        getContext.mockRestore()
+    })
+
+    it('redraws only changed probability cells when the board changes', async () => {
+        const canvasContext = createCanvasContext()
+        const getContext = vi.spyOn(HTMLCanvasElement.prototype, 'getContext')
+            .mockReturnValue(canvasContext as unknown as CanvasRenderingContext2D)
+        const wrapper = shallowMount(BoardProbability, {
+            props: {
+                board: [[0, 0.5]],
+            },
+            global: {
+                provide: {
+                    [minesweeperBoardKey as symbol]: {
+                        board: computed(() => undefined),
+                        size: computed(() => 16),
+                    },
+                },
+            },
+        })
+
+        await nextTick()
+        canvasContext.clearRect.mockClear()
+        canvasContext.fillText.mockClear()
+
+        await wrapper.setProps({ board: [[0, 0.75]] })
+
+        expect(canvasContext.fillText).toHaveBeenCalledTimes(1)
+        expect(canvasContext.clearRect).toHaveBeenCalledTimes(1)
+        expect(canvasContext.clearRect).toHaveBeenCalledWith(16, 0, 16, 16)
+        expect(canvasContext.fillText).toHaveBeenCalledWith('75', 24, 8)
+
+        canvasContext.clearRect.mockClear()
+        canvasContext.fillText.mockClear()
+        await wrapper.setProps({ board: [[0, 0.75]] })
+
+        expect(canvasContext.clearRect).not.toHaveBeenCalled()
+        expect(canvasContext.fillText).not.toHaveBeenCalled()
+
+        getContext.mockRestore()
+    })
+
+    it('hides probability values on opened cells and cells with foreground content', async () => {
+        const canvasContext = createCanvasContext()
+        const getContext = vi.spyOn(HTMLCanvasElement.prototype, 'getContext')
+            .mockReturnValue(canvasContext as unknown as CanvasRenderingContext2D)
+
+        shallowMount(BoardProbability, {
+            props: {
+                board: [[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7]],
+            },
+            global: {
+                provide: {
+                    [minesweeperBoardKey as symbol]: {
+                        board: computed(() => [[10, 0, 11, 12, 16, 5, 18]]),
+                        size: computed(() => 10),
+                    },
+                },
+            },
+        })
+
+        await nextTick()
+
+        expect(canvasContext.fillText).toHaveBeenCalledTimes(3)
+        expect(canvasContext.fillText).toHaveBeenNthCalledWith(1, '10', 5, 5)
+        expect(canvasContext.fillText).toHaveBeenNthCalledWith(2, '40', 35, 5)
+        expect(canvasContext.fillText).toHaveBeenNthCalledWith(3, '70', 65, 5)
+
+        getContext.mockRestore()
+    })
+
+    it('redraws only cells whose source board visibility changed', async () => {
+        const canvasContext = createCanvasContext()
+        const getContext = vi.spyOn(HTMLCanvasElement.prototype, 'getContext')
+            .mockReturnValue(canvasContext as unknown as CanvasRenderingContext2D)
+        const sourceBoard = ref([[10, 10]])
+
+        shallowMount(BoardProbability, {
+            props: {
+                board: [[0.25, 0.75]],
+            },
+            global: {
+                provide: {
+                    [minesweeperBoardKey as symbol]: {
+                        board: computed(() => sourceBoard.value),
+                        size: computed(() => 16),
+                    },
+                },
+            },
+        })
+
+        await nextTick()
+        canvasContext.clearRect.mockClear()
+        canvasContext.fillText.mockClear()
+
+        sourceBoard.value = [[0, 10]]
+        await nextTick()
+
+        expect(canvasContext.clearRect).toHaveBeenCalledTimes(1)
+        expect(canvasContext.clearRect).toHaveBeenCalledWith(0, 0, 16, 16)
+        expect(canvasContext.fillText).not.toHaveBeenCalled()
+
+        getContext.mockRestore()
+    })
 })
+
+function createCanvasContext() {
+    const fonts: string[] = []
+    return {
+        clearRect: vi.fn(),
+        fillText: vi.fn(),
+        fillStyle: '',
+        fonts,
+        get font() {
+            return fonts.at(-1) ?? ''
+        },
+        set font(value: string) {
+            fonts.push(value)
+        },
+        textAlign: '',
+        textBaseline: '',
+    }
+}

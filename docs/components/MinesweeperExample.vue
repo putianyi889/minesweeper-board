@@ -3,6 +3,9 @@
   <div class="play-example">
     <div class="play-toolbar">
       <button type="button" @click="reset">New board</button>
+      <button type="button" :aria-pressed="showProbability" @click="showProbability = !showProbability">
+        {{ showProbability ? 'Hide probability' : 'Show probability' }}
+      </button>
       <span>game_board_state: {{ backend?.game_board_state ?? 0 }}</span>
       <span>Hover: {{ hoverCell === undefined ? 'outside' : `${hoverCell.rowIndex + 1}, ${hoverCell.columnIndex + 1}` }}</span>
       <span>mouse_state: {{ backend?.mouse_state ?? 1 }}</span>
@@ -21,7 +24,9 @@
           @contextmenu.prevent
           @mousedown="handleMouseDown"
           @mouseup="handleMouseUp"
-        />
+        >
+          <BoardProbability v-if="probabilityBoard !== undefined" :board="probabilityBoard" />
+        </MinesweeperBoard>
       </div>
     </div>
   </div>
@@ -34,9 +39,8 @@
 import * as ms from 'ms-toollib'
 import { computed, onBeforeUnmount, ref, shallowRef, unref, watch } from 'vue'
 import type { Ref } from 'vue'
-import MinesweeperBoard from '../../src/components/MinesweeperBoard.vue'
-import Counter from '../../src/components/Counter.vue'
-import '../../src/styles/border.css'
+import MinesweeperBoard, { BoardProbability, Counter } from '@putianyi888/vue3-minesweeper-board'
+import '@putianyi888/vue3-minesweeper-board/style.css'
 
 type Board = number[][]
 type CellIndex = {
@@ -68,8 +72,15 @@ const GameBoardState = {
 const backend = shallowRef<Game>()
 const displayBoard = ref<Board>(createHiddenBoard())
 const boardView = ref<BoardView>()
+const showProbability = ref(false)
 
 const hoverCell = computed<CellIndex | undefined>(() => unref(boardView.value?.cellIndex))
+const probabilityBoard = computed<Board | undefined>(() => {
+  if (!showProbability.value) {
+    return undefined
+  }
+  return resolveProbabilityBoard(ms.cal_probability_onboard(createProbabilityInputBoard(), mines) as unknown)
+})
 
 watch(hoverCell, () => {
   const game = backend.value
@@ -89,6 +100,20 @@ function createHiddenBoard(): Board {
 
 function cloneMatrix(matrix: Board): Board {
   return Array.from(matrix, (row) => Array.from(row))
+}
+
+function createProbabilityInputBoard(): Board {
+  return displayBoard.value.map((row) => row.map((cell) => (cell === 18 ? 10 : cell)))
+}
+
+function resolveProbabilityBoard(result: unknown): Board {
+  if (isBoard(result)) {
+    return result
+  }
+  if (Array.isArray(result) && isBoard(result[0])) {
+    return result[0]
+  }
+  throw new TypeError('cal_probability_onboard returned an invalid board')
 }
 
 function syncBoard(): void {
