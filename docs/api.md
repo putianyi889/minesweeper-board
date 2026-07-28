@@ -8,8 +8,26 @@ import MinesweeperBoard, {
   BoardForeground,
   BoardProbability,
   Counter,
+  defaultMouseTraceColor,
+  defaultMouseTraceMarkers,
   innerBorderClass,
+  MouseTrace,
+  mouseTraceActions,
+  mouseTraceMarkerActions,
+  mouseTraceMarkerShapes,
+  mouseTraceStates,
   outerBorderClass,
+} from '@putianyi888/vue3-minesweeper-board'
+import type {
+  MouseTraceAction,
+  MouseTraceColor,
+  MouseTraceEvent,
+  MouseTraceMarker,
+  MouseTraceMarkerAction,
+  MouseTraceMarkers,
+  MouseTraceMarkerShape,
+  MouseTraceResolvedMarker,
+  MouseTraceState,
 } from '@putianyi888/vue3-minesweeper-board'
 
 import '@putianyi888/vue3-minesweeper-board/style.css'
@@ -91,6 +109,68 @@ content are skipped.
 | --- | --- | --- | --- |
 | `board` | `number[][]` | Yes | Probability matrix. Values are expected to be between `0` and `1`; displayed values are rounded to `0` - `100` without a percent sign. |
 | `color` | `(value: number, rowIndex: number, columnIndex: number) => string` | No | Maps each probability value to its text color. Defaults to black. |
+
+## MouseTrace Props
+
+`MouseTrace` is an optional canvas layer for rendering mouse paths and click
+markers. Place it in the default slot:
+
+```vue
+<MinesweeperBoard :board="board" :size="24">
+  <MouseTrace :events="events" :start-index="0" :end-index="events.length" />
+</MinesweeperBoard>
+```
+
+Mouse events use cell-unit coordinates, matching `cursorPosition`. Integer
+`row` and `column` values are rendered on grid lines; use `.5` for cell centers.
+
+```ts
+type MouseTraceEvent = {
+  row: number
+  column: number
+  state: 'uu' | 'du' | 'ud' | 'dd'
+  action: 'mv' | 'lc' | 'lr' | 'rc' | 'rr'
+}
+```
+
+The component treats `endIndex` as exclusive. When only the index window changes,
+it updates the canvas incrementally. Event array changes, in-place event changes,
+size changes, color changes, marker changes, or opacity changes redraw the full
+layer.
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `events` | `MouseTraceEvent[]` | Yes | Full mouse event sequence. |
+| `startIndex` | `number` | No | Inclusive start index. Defaults to `0`. |
+| `endIndex` | `number` | No | Exclusive end index. Defaults to `events.length`. |
+| `color` | `Partial<Record<'uu' \| 'du' \| 'ud' \| 'dd', string>>` | No | Trace line color by mouse state. |
+| `markers` | `Partial<Record<'lc' \| 'lr' \| 'rc' \| 'rr', MouseTraceMarker \| false>>` | No | Click marker overrides. Set an action to `false` to hide its marker. |
+| `opacity` | `number` | No | Opacity for the pure black background. Defaults to `0.2`. |
+| `lineWidth` | `number` | No | Trace line width in cell units. Defaults to `0.08`. |
+
+Marker configuration values are also measured in cell units:
+
+```ts
+type MouseTraceMarker = {
+  shape?: 'circle' | 'ring' | 'cross' | 'square' | 'diamond'
+  size?: number
+  fill?: string
+  stroke?: string
+  strokeWidth?: number
+  opacity?: number
+}
+```
+
+The package also exports reusable MouseTrace constants:
+
+| Name | Type |
+| --- | --- |
+| `mouseTraceStates` | `readonly ['uu', 'du', 'ud', 'dd']` |
+| `mouseTraceActions` | `readonly ['mv', 'lc', 'lr', 'rc', 'rr']` |
+| `mouseTraceMarkerActions` | `readonly ['lc', 'lr', 'rc', 'rr']` |
+| `mouseTraceMarkerShapes` | `readonly ['circle', 'ring', 'cross', 'square', 'diamond']` |
+| `defaultMouseTraceColor` | `MouseTraceColor` |
+| `defaultMouseTraceMarkers` | `Record<MouseTraceMarkerAction, MouseTraceResolvedMarker>` |
 
 ## Counter Props
 
