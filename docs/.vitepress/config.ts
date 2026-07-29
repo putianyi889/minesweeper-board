@@ -33,13 +33,25 @@ export default defineConfig({
       { text: 'Guide', link: '/guide' },
       { text: 'Example', link: '/example' },
       { text: 'Video', link: '/video' },
-      { text: 'API', link: '/api' },
+      { text: 'API', link: '/api/' },
     ],
     sidebar: [
       { text: 'Guide', link: '/guide' },
       { text: 'Example', link: '/example' },
       { text: 'Video', link: '/video' },
-      { text: 'API', link: '/api' },
+      {
+        text: 'API',
+        items: [
+          { text: 'Overview', link: '/api/' },
+          { text: 'MinesweeperBoard', link: '/api/minesweeper-board' },
+          { text: 'BoardBackground', link: '/api/board-background' },
+          { text: 'BoardForeground', link: '/api/board-foreground' },
+          { text: 'BoardProbability', link: '/api/board-probability' },
+          { text: 'MouseTrace', link: '/api/mouse-trace' },
+          { text: 'Counter', link: '/api/counter' },
+          { text: 'Border Classes', link: '/api/border-classes' },
+        ],
+      },
     ],
   },
 })
