@@ -8,6 +8,7 @@ import BoardForeground from '../../src/components/BoardForeground.vue'
 import BoardProbability from '../../src/components/BoardProbability.vue'
 import Counter from '../../src/components/Counter.vue'
 import MinesweeperBoard from '../../src/components/MinesweeperBoard.vue'
+import MouseTrace from '../../src/components/MouseTrace.vue'
 import { minesweeperBoardKey } from '../../src/components/context'
 
 describe('MinesweeperBoard', () => {
@@ -533,20 +534,187 @@ describe('MinesweeperBoard', () => {
 
         getContext.mockRestore()
     })
+
+    it('renders mouse trace lines and default click markers on canvas', async () => {
+        const canvasContext = createCanvasContext()
+        const getContext = vi.spyOn(HTMLCanvasElement.prototype, 'getContext')
+            .mockReturnValue(canvasContext as unknown as CanvasRenderingContext2D)
+
+        const wrapper = shallowMount(MouseTrace, {
+            props: {
+                color: {
+                    dd: '#444444',
+                    du: '#222222',
+                    ud: '#333333',
+                    uu: '#111111',
+                },
+                endIndex: 3,
+                events: [
+                    { action: 'mv', column: 0.5, row: 0.5, state: 'uu' },
+                    { action: 'lc', column: 1.5, row: 0.5, state: 'du' },
+                    { action: 'lr', column: 1.5, row: 1.5, state: 'uu' },
+                ],
+                opacity: 0.25,
+                startIndex: 0,
+            },
+            global: {
+                provide: {
+                    [minesweeperBoardKey as symbol]: {
+                        board: computed(() => [
+                            [10, 10],
+                            [10, 10],
+                        ]),
+                        size: computed(() => 10),
+                    },
+                },
+            },
+        })
+
+        await nextTick()
+
+        expect(wrapper.find('canvas').attributes('width')).toBe('20')
+        expect(wrapper.find('canvas').attributes('height')).toBe('20')
+        expect(canvasContext.fillRect).toHaveBeenCalledWith(0, 0, 20, 20)
+        expect(canvasContext.fillStyles).toContain('rgba(0, 0, 0, 0.25)')
+        expect(canvasContext.strokeStyles).toEqual(expect.arrayContaining(['#111111', '#222222']))
+        expect(canvasContext.moveTo).toHaveBeenCalledWith(5, 5)
+        expect(canvasContext.lineTo).toHaveBeenCalledWith(15, 5)
+        expect(canvasContext.lineTo).toHaveBeenCalledWith(15, 15)
+        expect(canvasContext.arc).toHaveBeenCalledWith(15, 5, 2.5, 0, Math.PI * 2)
+        expect(canvasContext.arc).toHaveBeenCalledWith(15, 15, 2.9, 0, Math.PI * 2)
+
+        getContext.mockRestore()
+    })
+
+    it('applies custom mouse trace marker configuration', async () => {
+        const canvasContext = createCanvasContext()
+        const getContext = vi.spyOn(HTMLCanvasElement.prototype, 'getContext')
+            .mockReturnValue(canvasContext as unknown as CanvasRenderingContext2D)
+
+        shallowMount(MouseTrace, {
+            props: {
+                events: [
+                    { action: 'rc', column: 0.5, row: 0.5, state: 'ud' },
+                ],
+                markers: {
+                    rc: {
+                        fill: '#123456',
+                        shape: 'square',
+                        size: 0.4,
+                        stroke: '#abcdef',
+                        strokeWidth: 0.1,
+                    },
+                },
+            },
+            global: {
+                provide: {
+                    [minesweeperBoardKey as symbol]: {
+                        board: computed(() => [[10]]),
+                        size: computed(() => 10),
+                    },
+                },
+            },
+        })
+
+        await nextTick()
+
+        expect(canvasContext.rect).toHaveBeenCalledWith(3, 3, 4, 4)
+        expect(canvasContext.fillStyles).toContain('#123456')
+        expect(canvasContext.strokeStyles).toContain('#abcdef')
+        expect(canvasContext.lineWidths).toContain(1)
+
+        getContext.mockRestore()
+    })
+
+    it('draws only appended mouse trace range when the end index increases', async () => {
+        const canvasContext = createCanvasContext()
+        const getContext = vi.spyOn(HTMLCanvasElement.prototype, 'getContext')
+            .mockReturnValue(canvasContext as unknown as CanvasRenderingContext2D)
+        const wrapper = shallowMount(MouseTrace, {
+            props: {
+                endIndex: 2,
+                events: [
+                    { action: 'mv', column: 0.5, row: 0.5, state: 'uu' },
+                    { action: 'mv', column: 1.5, row: 0.5, state: 'du' },
+                    { action: 'mv', column: 1.5, row: 1.5, state: 'dd' },
+                ],
+            },
+            global: {
+                provide: {
+                    [minesweeperBoardKey as symbol]: {
+                        board: computed(() => [
+                            [10, 10],
+                            [10, 10],
+                        ]),
+                        size: computed(() => 10),
+                    },
+                },
+            },
+        })
+
+        await nextTick()
+        canvasContext.clearRect.mockClear()
+        canvasContext.fillRect.mockClear()
+        canvasContext.lineTo.mockClear()
+
+        await wrapper.setProps({ endIndex: 3 })
+
+        expect(canvasContext.clearRect).not.toHaveBeenCalled()
+        expect(canvasContext.fillRect).not.toHaveBeenCalled()
+        expect(canvasContext.lineTo).toHaveBeenCalledTimes(1)
+        expect(canvasContext.lineTo).toHaveBeenCalledWith(15, 15)
+
+        getContext.mockRestore()
+    })
 })
 
 function createCanvasContext() {
     const fonts: string[] = []
+    const fillStyles: string[] = []
+    const lineWidths: number[] = []
+    const strokeStyles: string[] = []
     return {
+        arc: vi.fn(),
+        beginPath: vi.fn(),
+        closePath: vi.fn(),
         clearRect: vi.fn(),
+        fill: vi.fn(),
+        fillRect: vi.fn(),
         fillText: vi.fn(),
-        fillStyle: '',
+        fillStyles,
+        get fillStyle() {
+            return fillStyles.at(-1) ?? ''
+        },
+        set fillStyle(value: string) {
+            fillStyles.push(value)
+        },
         fonts,
         get font() {
             return fonts.at(-1) ?? ''
         },
         set font(value: string) {
             fonts.push(value)
+        },
+        globalAlpha: 1,
+        lineTo: vi.fn(),
+        lineWidths,
+        get lineWidth() {
+            return lineWidths.at(-1) ?? 1
+        },
+        set lineWidth(value: number) {
+            lineWidths.push(value)
+        },
+        moveTo: vi.fn(),
+        rect: vi.fn(),
+        restore: vi.fn(),
+        save: vi.fn(),
+        stroke: vi.fn(),
+        strokeStyles,
+        get strokeStyle() {
+            return strokeStyles.at(-1) ?? ''
+        },
+        set strokeStyle(value: string) {
+            strokeStyles.push(value)
         },
         textAlign: '',
         textBaseline: '',

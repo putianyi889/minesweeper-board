@@ -32,11 +32,13 @@ export default defineConfig({
     nav: [
       { text: 'Guide', link: '/guide' },
       { text: 'Example', link: '/example' },
+      { text: 'Video', link: '/video' },
       { text: 'API', link: '/api' },
     ],
     sidebar: [
       { text: 'Guide', link: '/guide' },
       { text: 'Example', link: '/example' },
+      { text: 'Video', link: '/video' },
       { text: 'API', link: '/api' },
     ],
   },
