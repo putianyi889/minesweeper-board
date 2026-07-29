@@ -11,7 +11,7 @@ hero:
       link: /guide
     - theme: alt
       text: API
-      link: /api
+      link: /api/
 
 features:
   - title: Small Surface
