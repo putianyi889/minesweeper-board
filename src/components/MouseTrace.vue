@@ -121,6 +121,10 @@ function renderDirtyIndexRange(context2d: CanvasRenderingContext2D, dirtyStartIn
         return
     }
 
+    context2d.save()
+    context2d.beginPath()
+    context2d.rect(dirtyRect.x, dirtyRect.y, dirtyRect.width, dirtyRect.height)
+    context2d.clip()
     context2d.clearRect(dirtyRect.x, dirtyRect.y, dirtyRect.width, dirtyRect.height)
     fillBackground(context2d, dirtyRect)
     for (let index = startIndex.value; index < endIndex.value - 1; index += 1) {
@@ -135,6 +139,7 @@ function renderDirtyIndexRange(context2d: CanvasRenderingContext2D, dirtyStartIn
             drawMarker(context2d, index)
         }
     }
+    context2d.restore()
 }
 
 function drawRange(context2d: CanvasRenderingContext2D, start: number, end: number) {
@@ -342,10 +347,11 @@ function getCanvasRect() {
 }
 
 function clampRect(rect: CanvasRect) {
-    const x = Math.max(0, rect.x)
-    const y = Math.max(0, rect.y)
-    const right = Math.min(canvasWidth.value, rect.x + rect.width)
-    const bottom = Math.min(canvasHeight.value, rect.y + rect.height)
+    // Clear and refill whole pixels so translucent backgrounds cannot accumulate at the edges.
+    const x = Math.max(0, Math.floor(rect.x))
+    const y = Math.max(0, Math.floor(rect.y))
+    const right = Math.min(canvasWidth.value, Math.ceil(rect.x + rect.width))
+    const bottom = Math.min(canvasHeight.value, Math.ceil(rect.y + rect.height))
     return {
         height: Math.max(0, bottom - y),
         width: Math.max(0, right - x),
