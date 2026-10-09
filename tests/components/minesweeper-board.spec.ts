@@ -626,6 +626,66 @@ describe('MinesweeperBoard', () => {
         getContext.mockRestore()
     })
 
+    it.each([
+        { endIndex: 2, startIndex: 0 },
+        { endIndex: 3, startIndex: 1 },
+    ])('keeps translucent mouse trace redraws within whole pixels for $startIndex..$endIndex', async (range) => {
+        const canvasContext = createCanvasContext()
+        const getContext = vi.spyOn(HTMLCanvasElement.prototype, 'getContext')
+            .mockReturnValue(canvasContext as unknown as CanvasRenderingContext2D)
+        const wrapper = shallowMount(MouseTrace, {
+            props: {
+                events: [
+                    { action: 'mv', column: 3.13, row: 3.17, state: 'uu' },
+                    { action: 'lc', column: 4.31, row: 4.37, state: 'du' },
+                    { action: 'mv', column: 5.41, row: 5.73, state: 'uu' },
+                ],
+                markers: { lc: { opacity: 0.5 } },
+                opacity: 0.25,
+            },
+            global: {
+                provide: {
+                    [minesweeperBoardKey as symbol]: {
+                        board: computed(() => Array.from({ length: 10 }, () => Array<number>(10).fill(10))),
+                        size: computed(() => 10),
+                    },
+                },
+            },
+        })
+
+        await nextTick()
+        for (let repeat = 0; repeat < 3; repeat += 1) {
+            canvasContext.clearRect.mockClear()
+            canvasContext.fillRect.mockClear()
+            canvasContext.rect.mockClear()
+            canvasContext.clip.mockClear()
+            canvasContext.save.mockClear()
+            canvasContext.restore.mockClear()
+            canvasContext.stroke.mockClear()
+
+            await wrapper.setProps(range)
+
+            // The fractional bounds (25.5, 25.9)..(59.9, 63.1) must cover complete pixels.
+            expect(canvasContext.clearRect).toHaveBeenCalledExactlyOnceWith(25, 25, 35, 39)
+            expect(canvasContext.fillRect).toHaveBeenCalledExactlyOnceWith(25, 25, 35, 39)
+            expect(canvasContext.rect).toHaveBeenCalledExactlyOnceWith(25, 25, 35, 39)
+            expect(canvasContext.clip).toHaveBeenCalledTimes(1)
+            expect(canvasContext.save.mock.invocationCallOrder[0])
+                .toBeLessThan(canvasContext.clip.mock.invocationCallOrder[0]!)
+            expect(canvasContext.clip.mock.invocationCallOrder[0])
+                .toBeLessThan(canvasContext.clearRect.mock.invocationCallOrder[0]!)
+            expect(canvasContext.clearRect.mock.invocationCallOrder[0])
+                .toBeLessThan(canvasContext.fillRect.mock.invocationCallOrder[0]!)
+            expect(canvasContext.restore.mock.invocationCallOrder.at(-1))
+                .toBeGreaterThan(canvasContext.stroke.mock.invocationCallOrder.at(-1)!)
+            expect(canvasContext.restore).toHaveBeenCalledTimes(canvasContext.save.mock.calls.length)
+
+            await wrapper.setProps({ endIndex: 3, startIndex: 0 })
+        }
+
+        getContext.mockRestore()
+    })
+
     it('draws only appended mouse trace range when the end index increases', async () => {
         const canvasContext = createCanvasContext()
         const getContext = vi.spyOn(HTMLCanvasElement.prototype, 'getContext')
@@ -678,6 +738,7 @@ function createCanvasContext() {
         beginPath: vi.fn(),
         closePath: vi.fn(),
         clearRect: vi.fn(),
+        clip: vi.fn(),
         fill: vi.fn(),
         fillRect: vi.fn(),
         fillText: vi.fn(),

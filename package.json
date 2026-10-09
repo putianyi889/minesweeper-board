@@ -33,6 +33,7 @@
     "docs:preview": "vitepress preview docs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "lintfix": "eslint . --fix",
     "prepack": "npm run build",
     "test": "vitest run",
     "coverage": "vitest run --coverage",
