@@ -12,14 +12,14 @@
 import { computed, inject, onMounted, ref, watch } from 'vue'
 import type { PropType } from 'vue'
 import { minesweeperBoardKey } from './context'
-import { defaultMouseTraceColor, defaultMouseTraceMarkers } from './mouseTrace'
+import { defaultMouseTraceMarkers } from './mouseTrace'
+import { createMouseTracePainter } from '../rendering/mouseTrace'
+import { useLayerRenderer } from '../rendering/useLayerRenderer'
 import type {
     MouseTraceColor,
     MouseTraceEvent,
-    MouseTraceMarker,
     MouseTraceMarkerAction,
     MouseTraceMarkers,
-    MouseTraceState,
 } from './mouseTrace'
 
 type CanvasRect = {
@@ -142,132 +142,38 @@ function renderDirtyIndexRange(context2d: CanvasRenderingContext2D, dirtyStartIn
     context2d.restore()
 }
 
+const painter = computed(() => createMouseTracePainter(props, boardContext.size.value))
+
 function drawRange(context2d: CanvasRenderingContext2D, start: number, end: number) {
-    drawSegments(context2d, start, end)
-    drawMarkers(context2d, start, end)
+    painter.value.drawRange(context2d, start, end)
 }
 
 function drawSegments(context2d: CanvasRenderingContext2D, start: number, end: number) {
-    const clampedStart = clampIndex(start, startIndex.value, endIndex.value)
-    const clampedEnd = clampIndex(end, clampedStart, endIndex.value)
-    for (let index = clampedStart; index < clampedEnd - 1; index += 1) {
-        drawSegment(context2d, index)
-    }
+    painter.value.drawSegments(context2d, start, end)
 }
 
 function drawSegment(context2d: CanvasRenderingContext2D, index: number) {
-    const event = props.events[index]
-    const nextEvent = props.events[index + 1]
-    if (event === undefined || nextEvent === undefined || !isFiniteEvent(event) || !isFiniteEvent(nextEvent)) {
-        return
-    }
-
-    const start = getEventPosition(event)
-    const end = getEventPosition(nextEvent)
-    context2d.save()
-    context2d.beginPath()
-    context2d.lineCap = 'round'
-    context2d.lineJoin = 'round'
-    context2d.lineWidth = Math.max(1, props.lineWidth * boardContext.size.value)
-    context2d.strokeStyle = getColor(event.state)
-    context2d.moveTo(start.x, start.y)
-    context2d.lineTo(end.x, end.y)
-    context2d.stroke()
-    context2d.restore()
+    painter.value.drawSegment(context2d, index)
 }
 
 function drawMarkers(context2d: CanvasRenderingContext2D, start: number, end: number) {
-    const clampedStart = clampIndex(start, startIndex.value, endIndex.value)
-    const clampedEnd = clampIndex(end, clampedStart, endIndex.value)
-    for (let index = clampedStart; index < clampedEnd; index += 1) {
-        drawMarker(context2d, index)
-    }
+    painter.value.drawMarkers(context2d, start, end)
 }
 
 function drawMarker(context2d: CanvasRenderingContext2D, index: number) {
-    const event = props.events[index]
-    if (event === undefined || event.action === 'mv' || !isFiniteEvent(event)) {
-        return
-    }
-    const marker = getMarker(event.action)
-    if (marker === undefined) {
-        return
-    }
-
-    const { x, y } = getEventPosition(event)
-    const size = Math.max(1, marker.size * boardContext.size.value)
-    const halfSize = size / 2
-    const strokeWidth = Math.max(1, marker.strokeWidth * boardContext.size.value)
-
-    context2d.save()
-    context2d.globalAlpha = clampOpacity(marker.opacity)
-    context2d.fillStyle = marker.fill
-    context2d.strokeStyle = marker.stroke
-    context2d.lineCap = 'round'
-    context2d.lineJoin = 'round'
-    context2d.lineWidth = strokeWidth
-
-    if (marker.shape === 'cross') {
-        context2d.beginPath()
-        context2d.moveTo(x - halfSize, y - halfSize)
-        context2d.lineTo(x + halfSize, y + halfSize)
-        context2d.moveTo(x + halfSize, y - halfSize)
-        context2d.lineTo(x - halfSize, y + halfSize)
-        context2d.stroke()
-    } else if (marker.shape === 'square') {
-        drawClosedPath(context2d, () => {
-            context2d.rect(x - halfSize, y - halfSize, size, size)
-        }, marker)
-    } else if (marker.shape === 'diamond') {
-        drawClosedPath(context2d, () => {
-            context2d.moveTo(x, y - halfSize)
-            context2d.lineTo(x + halfSize, y)
-            context2d.lineTo(x, y + halfSize)
-            context2d.lineTo(x - halfSize, y)
-            context2d.closePath()
-        }, marker)
-    } else {
-        drawClosedPath(context2d, () => {
-            context2d.arc(x, y, halfSize, 0, Math.PI * 2)
-        }, marker)
-    }
-    context2d.restore()
-}
-
-function drawClosedPath(context2d: CanvasRenderingContext2D, drawPath: () => void, marker: Required<MouseTraceMarker>) {
-    context2d.beginPath()
-    drawPath()
-    if (marker.shape !== 'ring' && marker.fill !== 'transparent') {
-        context2d.fill()
-    }
-    context2d.stroke()
+    painter.value.drawMarker(context2d, index)
 }
 
 function fillBackground(context2d: CanvasRenderingContext2D, rect: CanvasRect) {
-    context2d.save()
-    context2d.fillStyle = `rgba(0, 0, 0, ${clampOpacity(props.opacity)})`
-    context2d.fillRect(rect.x, rect.y, rect.width, rect.height)
-    context2d.restore()
+    painter.value.fillBackground(context2d, rect)
 }
 
 function getEventPosition(event: MouseTraceEvent) {
-    const size = boardContext.size.value
-    return {
-        x: event.column * size,
-        y: event.row * size,
-    }
-}
-
-function getColor(state: MouseTraceState) {
-    return props.color[state] ?? defaultMouseTraceColor[state]
+    return painter.value.getEventPosition(event)
 }
 
 function getMarker(action: MouseTraceMarkerAction) {
-    const marker = props.markers[action]
-    if (marker === false) {
-        return undefined
-    }
-    return { ...defaultMouseTraceMarkers[action], ...marker }
+    return painter.value.getMarker(action)
 }
 
 function getEventRangeRect(start: number, end: number) {
@@ -410,13 +316,6 @@ function clampIndex(value: number, min: number, max: number) {
     return Math.min(max, Math.max(min, Math.trunc(value)))
 }
 
-function clampOpacity(value: number) {
-    if (!Number.isFinite(value)) {
-        return 0
-    }
-    return Math.min(1, Math.max(0, value))
-}
-
 onMounted(() => {
     renderAll()
 })
@@ -440,6 +339,14 @@ watch([
 ], () => {
     renderAll()
 }, { deep: true, flush: 'post' })
+const cellSize = computed(() => boardContext.size.value)
+const render = useLayerRenderer('mouseTrace', () => ({
+    board: boardContext.board.value ?? Array.from({ length: rowCount.value }, () => Array<number>(columnCount.value).fill(10)),
+    size: cellSize.value,
+    layers: { background: false, foreground: false, mouseTrace: { ...props } },
+}))
+
+defineExpose({ cellSize, render })
 </script>
 
 <style scoped>

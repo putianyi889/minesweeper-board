@@ -33,16 +33,19 @@ export default defineConfig({
       { text: 'Guide', link: '/guide' },
       { text: 'Example', link: '/example' },
       { text: 'Video', link: '/video' },
+      { text: 'Rendering', link: '/rendering' },
       { text: 'API', link: '/api/' },
     ],
     sidebar: [
       { text: 'Guide', link: '/guide' },
       { text: 'Example', link: '/example' },
       { text: 'Video', link: '/video' },
+      { text: 'Rendering', link: '/rendering' },
       {
         text: 'API',
         items: [
           { text: 'Overview', link: '/api/' },
+          { text: 'Canvas / Bitmap Rendering', link: '/api/rendering' },
           { text: 'MinesweeperBoard', link: '/api/minesweeper-board' },
           { text: 'BoardBackground', link: '/api/board-background' },
           { text: 'BoardForeground', link: '/api/board-foreground' },

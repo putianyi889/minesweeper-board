@@ -1,5 +1,12 @@
 # BoardBackground
 
+## Canvas / Bitmap Output
+
+Template refs expose `cellSize` and asynchronous `render(options?)`. The returned
+snapshot preserves alpha and shares the source board's extent and coordinates
+with the other layers. See [rendering](./rendering#component-outputs) for completion,
+ownership, bitmap output and release rules. `cellIndex` remains available.
+
 ## Props
 
 | Name | Type | Required | Description |

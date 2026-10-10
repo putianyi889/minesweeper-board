@@ -1,5 +1,12 @@
 # BoardProbability
 
+## Canvas / Bitmap Output
+
+Template refs expose `cellSize` and asynchronous `render(options?)`. The canvas
+extent follows the source board context when present; otherwise it follows the
+probability matrix. See [rendering](./rendering#component-outputs) for transparent
+output, completion, ownership, bitmap output and release rules.
+
 `BoardProbability` is an optional canvas layer. It is not loaded by
 `MinesweeperBoard` automatically; place it in the default slot when needed:
 

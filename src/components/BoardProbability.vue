@@ -14,7 +14,9 @@ import type { PropType } from 'vue'
 import { minesweeperBoardKey } from './context'
 import { cloneMatrix, hasShapeChanged } from './utils'
 
-type ProbabilityColor = (value: number, rowIndex: number, columnIndex: number) => string
+import { drawProbabilityCell } from '../rendering/probability'
+import type { ProbabilityColor } from '../rendering/probability'
+import { getLayerSourceBoard, useLayerRenderer } from '../rendering/useLayerRenderer'
 
 const props = defineProps({
     /** Probability matrix. Values are expected to be between 0 and 1. */
@@ -33,8 +35,8 @@ if (context === undefined) {
 const boardContext = context
 
 const canvasElement = ref<HTMLCanvasElement>()
-const rowCount = computed(() => props.board.length)
-const columnCount = computed(() => props.board.reduce((max, row) => Math.max(max, row.length), 0))
+const rowCount = computed(() => (boardContext.board.value ?? props.board).length)
+const columnCount = computed(() => (boardContext.board.value ?? props.board).reduce((max, row) => Math.max(max, row.length), 0))
 const canvasWidth = computed(() => columnCount.value * boardContext.size.value)
 const canvasHeight = computed(() => rowCount.value * boardContext.size.value)
 const sourceBoard = computed(() => boardContext.board.value)
@@ -90,46 +92,7 @@ function renderChangedCells() {
 }
 
 function renderCell(context2d: CanvasRenderingContext2D, value: number, rowIndex: number, columnIndex: number) {
-    const size = boardContext.size.value
-    const x = columnIndex * size
-    const y = rowIndex * size
-    const probability = normalizeProbability(value)
-
-    context2d.clearRect(x, y, size, size)
-    if (!shouldDisplayProbability(rowIndex, columnIndex)) {
-        return
-    }
-
-    const text = String(Math.round(probability * 100))
-    context2d.fillStyle = props.color(probability, rowIndex, columnIndex)
-    context2d.font = `${getProbabilityFontSize(size, text)}px sans-serif`
-    context2d.textAlign = 'center'
-    context2d.textBaseline = 'middle'
-    context2d.fillText(text, x + size / 2, y + size / 2)
-}
-
-function getProbabilityFontSize(size: number, text: string) {
-    return Math.max(1, size * (text === '100' ? 0.42 : 0.54))
-}
-
-function shouldDisplayProbability(rowIndex: number, columnIndex: number) {
-    const sourceCell = sourceBoard.value?.[rowIndex]?.[columnIndex]
-    switch (sourceCell) {
-        case undefined:
-        case 10:
-        case 12:
-        case 18:
-            return true
-        default:
-            return false
-    }
-}
-
-function normalizeProbability(value: number) {
-    if (!Number.isFinite(value)) {
-        return 0
-    }
-    return Math.min(1, Math.max(0, value))
+    drawProbabilityCell(context2d, value, rowIndex, columnIndex, boardContext.size.value, sourceBoard.value, props.color)
 }
 
 function cloneOptionalMatrix(matrix: number[][] | undefined) {
@@ -159,6 +122,14 @@ watch([
 ], () => {
     renderAllCells()
 }, { flush: 'post' })
+const cellSize = computed(() => boardContext.size.value)
+const render = useLayerRenderer('probability', () => ({
+    board: getLayerSourceBoard(sourceBoard.value, props.board),
+    size: cellSize.value,
+    layers: { background: false, foreground: false, probability: { board: props.board, color: props.color } },
+}))
+
+defineExpose({ cellSize, render })
 </script>
 
 <style scoped>
