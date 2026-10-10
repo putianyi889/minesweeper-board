@@ -19,6 +19,7 @@
     ],
     "skipLibCheck": true
   },
+  "exclude": ["tests/types/worker-only.ts"],
   "include": [
     "src/**/*.ts",
     "src/**/*.vue",

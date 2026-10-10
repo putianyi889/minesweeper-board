@@ -18,7 +18,7 @@ export default [
   ...tseslint.configs.recommended,
   ...vue.configs['flat/recommended'],
   {
-    files: ['**/*.{js,ts,vue}'],
+    files: ['**/*.{js,mjs,ts,vue}'],
     languageOptions: {
       ecmaVersion: 'latest',
       globals: {

@@ -16,6 +16,10 @@ import num8 from '../assets/num8.svg?url'
 
 export const backgroundImages = { down: celldown, up: cellup }
 export const foregroundImages = { blank, num1, num2, num3, num4, num5, num6, num7, num8, mine, flag, falsemine, blast }
+/** Blank foreground cells require no texture. This immutable catalog is safe to import in a Worker. */
+export const boardTextureUrls = Object.freeze({ ...backgroundImages, num1, num2, num3, num4, num5, num6, num7, num8, mine, flag, falsemine, blast })
+export type BoardTextureKey = keyof typeof boardTextureUrls
+export type WorkerBoardTextures = Partial<Record<BoardTextureKey, ImageBitmap>>
 const downValues = new Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 14, 15, 18])
 const foregroundValueByBoardValue: Record<number, number> = {
     0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8,

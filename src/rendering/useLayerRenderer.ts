@@ -11,8 +11,8 @@ export function useLayerRenderer(name: BoardLayerName, getInput: () => BoardRend
         renderer?.destroy()
     })
 
-    function render(options?: { output?: 'canvas' }): Promise<LayerRenderFrame<HTMLCanvasElement>>
-    function render(options: { output: 'image-bitmap' }): Promise<LayerRenderFrame<ImageBitmap>>
+    function render(options?: { output?: 'canvas'; signal?: AbortSignal }): Promise<LayerRenderFrame<HTMLCanvasElement>>
+    function render(options: { output: 'image-bitmap'; signal?: AbortSignal }): Promise<LayerRenderFrame<ImageBitmap>>
     function render(options: RenderOptions): Promise<LayerRenderFrame>
     async function render(options: RenderOptions = {}): Promise<LayerRenderFrame> {
         // Includes prop/context updates already scheduled by Vue. Decode never relies on a screen refresh.

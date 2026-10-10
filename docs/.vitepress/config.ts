@@ -46,6 +46,7 @@ export default defineConfig({
         items: [
           { text: 'Overview', link: '/api/' },
           { text: 'Canvas / Bitmap Rendering', link: '/api/rendering' },
+          { text: 'Worker Rendering', link: '/api/worker-rendering' },
           { text: 'MinesweeperBoard', link: '/api/minesweeper-board' },
           { text: 'BoardBackground', link: '/api/board-background' },
           { text: 'BoardForeground', link: '/api/board-foreground' },

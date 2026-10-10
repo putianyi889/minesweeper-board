@@ -67,3 +67,12 @@ actual `cellSize` through a template ref. Rendering waits for texture decode and
 rejects on failure. Released canvas buffers and decoded textures are reused.
 See the [rendering API](docs/api/rendering.md) for completion and ownership rules,
 and the [browser verification example](docs/rendering.md).
+
+Module Workers can import `createBoardRenderer` from
+`@putianyi888/vue3-minesweeper-board/worker`. This DOM-free entry uses
+OffscreenCanvas and defaults to transferable ImageBitmap layers. Prepare the
+built-in SVG textures once with the main-thread `loadWorkerBoardTextures()`
+helper, then transfer an independently owned set to each Worker. Worker-local
+PNG loading and custom bitmap loaders are also supported. The caller manages
+Worker scheduling, compositing and encoding. See [Worker rendering](docs/api/worker-rendering.md)
+for Vite setup, cancellation, deployment and resource ownership.
