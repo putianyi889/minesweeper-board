@@ -1,5 +1,12 @@
 # MouseTrace
 
+## Canvas / Bitmap Output
+
+Template refs expose `cellSize` and asynchronous `render(options?)`. Export uses
+the same line and marker painter as the visible layer; set `opacity="0"` for a
+transparent trace background. See [rendering](./rendering#component-outputs) for
+completion, shared coordinates, ownership, bitmap output and release rules.
+
 `MouseTrace` is an optional canvas layer for rendering mouse paths and click
 markers. Place it in the default slot:
 

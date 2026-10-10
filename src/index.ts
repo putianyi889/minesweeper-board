@@ -7,6 +7,22 @@ export { default as Counter } from './components/Counter.vue'
 export { default as MinesweeperBoard } from './components/MinesweeperBoard.vue'
 export { default as MouseTrace } from './components/MouseTrace.vue'
 export { default } from './components/MinesweeperBoard.vue'
+export { BoardRenderError, createBoardRenderer } from './rendering/renderer'
+export type { BoardRenderErrorCode } from './rendering/renderer'
+export type { ProbabilityColor } from './rendering/probability'
+export type {
+    BoardLayerName,
+    BoardRenderFrame,
+    BoardRenderInput,
+    BoardRenderer,
+    LayerRenderFrame,
+    LayerRenderHandle,
+    MouseTraceSettings,
+    RenderDimensions,
+    RenderOptions,
+    RenderOutput,
+    RenderSource,
+} from './rendering/types'
 export {
     defaultMouseTraceColor,
     defaultMouseTraceMarkers,

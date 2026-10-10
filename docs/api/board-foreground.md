@@ -1,5 +1,12 @@
 # BoardForeground
 
+## Canvas / Bitmap Output
+
+Template refs expose `cellSize` and asynchronous `render(options?)`. Blank cells
+remain transparent in the detached output. See
+[rendering](./rendering#component-outputs) for shared coordinates, completion,
+ownership, bitmap output and release rules.
+
 ## Props
 
 | Name | Type | Required | Description |

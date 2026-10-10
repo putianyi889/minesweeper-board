@@ -8,6 +8,8 @@ import MinesweeperBoard, {
   BoardForeground,
   BoardProbability,
   Counter,
+  createBoardRenderer,
+  BoardRenderError,
   defaultMouseTraceColor,
   defaultMouseTraceMarkers,
   innerBorderClass,
@@ -19,6 +21,11 @@ import MinesweeperBoard, {
   outerBorderClass,
 } from '@putianyi888/vue3-minesweeper-board'
 import type {
+  BoardRenderInput,
+  BoardRenderFrame,
+  BoardRenderer,
+  LayerRenderHandle,
+  LayerRenderFrame,
   MouseTraceAction,
   MouseTraceColor,
   MouseTraceEvent,
@@ -44,4 +51,5 @@ import '@putianyi888/vue3-minesweeper-board/style.css'
 
 ## Utilities
 
+- [Canvas / Bitmap Rendering](./rendering)
 - [Border Classes](./border-classes)
