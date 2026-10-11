@@ -19,6 +19,7 @@
     ],
     "skipLibCheck": true
   },
+  "exclude": ["tests/types/worker-only.ts", "tests/fixtures/worker-vite"],
   "include": [
     "src/**/*.ts",
     "src/**/*.vue",

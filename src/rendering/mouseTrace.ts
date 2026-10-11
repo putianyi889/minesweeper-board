@@ -1,18 +1,19 @@
+import type { DrawingContext } from './drawingContext'
 import { defaultMouseTraceColor, defaultMouseTraceMarkers } from '../components/mouseTrace'
 import type { MouseTraceEvent, MouseTraceMarker, MouseTraceMarkerAction, MouseTraceState } from '../components/mouseTrace'
-import type { MouseTraceSettings } from './types'
+import type { MouseTraceSettings } from './coreTypes'
 
 type CanvasRect = { x: number; y: number; width: number; height: number }
 
 export function createMouseTracePainter(settings: MouseTraceSettings, cellSize: number) {
     const rangeStart = clampIndex(settings.startIndex ?? 0, 0, settings.events.length)
     const rangeEnd = clampIndex(settings.endIndex ?? settings.events.length, rangeStart, settings.events.length)
-    function drawRange(context2d: CanvasRenderingContext2D, start: number, end: number) {
+    function drawRange(context2d: DrawingContext, start: number, end: number) {
         drawSegments(context2d, start, end)
         drawMarkers(context2d, start, end)
     }
 
-    function drawSegments(context2d: CanvasRenderingContext2D, start: number, end: number) {
+    function drawSegments(context2d: DrawingContext, start: number, end: number) {
         const clampedStart = clampIndex(start, rangeStart, rangeEnd)
         const clampedEnd = clampIndex(end, clampedStart, rangeEnd)
         for (let index = clampedStart; index < clampedEnd - 1; index += 1) {
@@ -20,7 +21,7 @@ export function createMouseTracePainter(settings: MouseTraceSettings, cellSize: 
         }
     }
 
-    function drawSegment(context2d: CanvasRenderingContext2D, index: number) {
+    function drawSegment(context2d: DrawingContext, index: number) {
         const event = settings.events[index]
         const nextEvent = settings.events[index + 1]
         if (event === undefined || nextEvent === undefined || !isFiniteEvent(event) || !isFiniteEvent(nextEvent)) {
@@ -41,7 +42,7 @@ export function createMouseTracePainter(settings: MouseTraceSettings, cellSize: 
         context2d.restore()
     }
 
-    function drawMarkers(context2d: CanvasRenderingContext2D, start: number, end: number) {
+    function drawMarkers(context2d: DrawingContext, start: number, end: number) {
         const clampedStart = clampIndex(start, rangeStart, rangeEnd)
         const clampedEnd = clampIndex(end, clampedStart, rangeEnd)
         for (let index = clampedStart; index < clampedEnd; index += 1) {
@@ -49,7 +50,7 @@ export function createMouseTracePainter(settings: MouseTraceSettings, cellSize: 
         }
     }
 
-    function drawMarker(context2d: CanvasRenderingContext2D, index: number) {
+    function drawMarker(context2d: DrawingContext, index: number) {
         const event = settings.events[index]
         if (event === undefined || event.action === 'mv' || !isFiniteEvent(event)) {
             return
@@ -99,7 +100,7 @@ export function createMouseTracePainter(settings: MouseTraceSettings, cellSize: 
         context2d.restore()
     }
 
-    function drawClosedPath(context2d: CanvasRenderingContext2D, drawPath: () => void, marker: Required<MouseTraceMarker>) {
+    function drawClosedPath(context2d: DrawingContext, drawPath: () => void, marker: Required<MouseTraceMarker>) {
         context2d.beginPath()
         drawPath()
         if (marker.shape !== 'ring' && marker.fill !== 'transparent') {
@@ -108,7 +109,7 @@ export function createMouseTracePainter(settings: MouseTraceSettings, cellSize: 
         context2d.stroke()
     }
 
-    function fillBackground(context2d: CanvasRenderingContext2D, rect: CanvasRect) {
+    function fillBackground(context2d: DrawingContext, rect: CanvasRect) {
         context2d.save()
         context2d.fillStyle = `rgba(0, 0, 0, ${clampOpacity(settings.opacity ?? 0.2)})`
         context2d.fillRect(rect.x, rect.y, rect.width, rect.height)

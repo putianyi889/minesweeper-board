@@ -1,6 +1,6 @@
 {
   "name": "@putianyi888/vue3-minesweeper-board",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Vue 3 Minesweeper board component for ms_toollib game board values.",
   "type": "module",
   "license": "MIT",
@@ -19,7 +19,11 @@
       "import": "./dist/minesweeper-board.js",
       "require": "./dist/minesweeper-board.umd.cjs"
     },
-    "./style.css": "./dist/minesweeper-board.css"
+    "./style.css": "./dist/minesweeper-board.css",
+    "./worker": {
+      "types": "./dist/worker.d.ts",
+      "import": "./dist/worker.js"
+    }
   },
   "files": [
     "dist",
@@ -27,7 +31,9 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "vue-tsc --noEmit && vite build",
+    "build": "vue-tsc --noEmit && vite build && vite build --config vite.worker.config.ts",
+    "typecheck:worker": "tsc --project tests/types/tsconfig.worker.json",
+    "test:worker:build": "tsc --project tests/fixtures/worker-vite/tsconfig.json && vite build --config tests/fixtures/worker-vite/vite.config.ts",
     "docs:build": "vitepress build docs",
     "docs:dev": "vitepress dev docs",
     "docs:preview": "vitepress preview docs",

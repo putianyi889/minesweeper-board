@@ -1,7 +1,8 @@
+import type { DrawingContext } from './drawingContext'
 export type ProbabilityColor = (value: number, rowIndex: number, columnIndex: number) => string
 
 export function drawProbabilityCell(
-    context: CanvasRenderingContext2D,
+    context: DrawingContext,
     value: number,
     row: number,
     column: number,

@@ -52,5 +52,11 @@ jobs:
       - name: Build package
         run: npm run build
 
+      - name: Check Worker declarations
+        run: npm run typecheck:worker
+
+      - name: Check and build Worker consumer
+        run: npm run test:worker:build
+
       - name: Build docs
         run: npm run docs:build

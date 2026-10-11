@@ -3,6 +3,9 @@
 `createBoardRenderer()` renders board layers without mounting Vue, changing the
 visible board, or capturing DOM. It runs in a browser on the main thread.
 
+For module Workers and OffscreenCanvas, use the separate
+[Worker rendering entry](./worker-rendering). Both entries share the drawing core.
+
 ```ts
 import { createBoardRenderer } from '@putianyi888/vue3-minesweeper-board'
 
@@ -99,6 +102,7 @@ buffers reclaimed. Failed texture entries are evicted so a later call may retry.
 | `BITMAP_UNAVAILABLE` | `createImageBitmap` is unavailable, or the requested bitmap extent is empty. Empty boards are supported for canvas output. |
 | `DRAW_FAILED` | Drawing, a color callback, or bitmap conversion failed. |
 | `DESTROYED` | The renderer was destroyed, or the exporting component unmounted. |
+| `CANCELLED` | The request's optional `signal` was aborted. |
 
 Bundled textures use anonymous CORS loading, including when a build serves assets
 from a separate origin. That asset server must allow the origin; a failed load
@@ -116,8 +120,10 @@ rejects the Promise rather than returning a missing layer.
   pool; they may be overwritten by a later render. The pool retains at most one
   idle canvas per layer, so retaining many frames is a caller-owned memory cost.
 - Bitmap sources are independent from the buffers and are closed by `release()`.
-  Do not close them separately. To transfer ownership to another consumer or keep
-  a source beyond release, first make your own copy and manage that copy's lifetime.
+  They may be transferred directly with a `postMessage` transfer list. Afterwards,
+  sender-side `release()` closes detached handles; the recipient owns and closes
+  its handles after consumption. If posting fails, release closes local handles.
+  To keep an untransferred source beyond release, make an independently owned copy.
 - Decoded textures are reused across frames and sizes until `destroy()`.
   `destroy()` is idempotent, rejects active and queued requests immediately,
   prevents new renders, and clears textures and idle canvases. Already returned

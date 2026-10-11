@@ -52,4 +52,5 @@ import '@putianyi888/vue3-minesweeper-board/style.css'
 ## Utilities
 
 - [Canvas / Bitmap Rendering](./rendering)
+- [Worker Rendering](./worker-rendering)
 - [Border Classes](./border-classes)
