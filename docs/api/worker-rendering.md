@@ -229,8 +229,10 @@ node tests/worker-browser.mjs
 
 The declaration check imports the published `/worker` entry with only `ES2022`
 and `WebWorker` libraries, no DOM/Vue type libraries. The integration fixture
-imports the actual package exports and uses two native module Workers. The
-browser runner checks Vite development and production under `/export/`, texture
+imports the actual package exports and uses two native module Workers. Its
+`test:worker:build` command checks consumer types after building the package,
+then builds the Vite application; source typechecking does not require `dist`.
+The browser runner checks Vite development and production under `/export/`, texture
 pixels, alpha, transferred output survival after sender release/destruction,
 instance isolation and probability/trace pixel parity. Set `WORKER_TEST_BROWSER`
 to a Chrome/Edge executable if the default installation paths do not apply.
