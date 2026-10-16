@@ -50,7 +50,7 @@
     "vue": "^3.5.0"
   },
   "dependencies": {
-    "@putianyi888/vue3-plots": "^0.6.0"
+    "@putianyi888/vue3-plots": "^0.7.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
