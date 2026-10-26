@@ -52,6 +52,7 @@ export default defineConfig({
           { text: 'BoardForeground', link: '/api/board-foreground' },
           { text: 'BoardProbability', link: '/api/board-probability' },
           { text: 'MouseTrace', link: '/api/mouse-trace' },
+          { text: 'TouchTrace', link: '/api/touch-trace' },
           { text: 'Counter', link: '/api/counter' },
           { text: 'Border Classes', link: '/api/border-classes' },
         ],
