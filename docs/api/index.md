@@ -14,6 +14,7 @@ import MinesweeperBoard, {
   defaultMouseTraceMarkers,
   innerBorderClass,
   MouseTrace,
+  TouchTrace,
   mouseTraceActions,
   mouseTraceMarkerActions,
   mouseTraceMarkerShapes,
@@ -35,6 +36,9 @@ import type {
   MouseTraceMarkerShape,
   MouseTraceResolvedMarker,
   MouseTraceState,
+  TouchTraceEvent,
+  TouchTraceAction,
+  TouchTraceMarker,
 } from '@putianyi888/vue3-minesweeper-board'
 
 import '@putianyi888/vue3-minesweeper-board/style.css'
@@ -47,6 +51,7 @@ import '@putianyi888/vue3-minesweeper-board/style.css'
 - [BoardForeground](./board-foreground)
 - [BoardProbability](./board-probability)
 - [MouseTrace](./mouse-trace)
+- [TouchTrace](./touch-trace)
 - [Counter](./counter)
 
 ## Utilities

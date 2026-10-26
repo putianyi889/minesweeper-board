@@ -2,6 +2,7 @@ import type { DrawingContext } from './drawingContext'
 import { defaultMouseTraceColor, defaultMouseTraceMarkers } from '../components/mouseTrace'
 import type { MouseTraceEvent, MouseTraceMarker, MouseTraceMarkerAction, MouseTraceState } from '../components/mouseTrace'
 import type { MouseTraceSettings } from './coreTypes'
+import { clampTraceOpacity as clampOpacity, resolveTraceMarker } from './traceMarker'
 
 type CanvasRect = { x: number; y: number; width: number; height: number }
 
@@ -128,11 +129,7 @@ export function createMouseTracePainter(settings: MouseTraceSettings, cellSize: 
     }
 
     function getMarker(action: MouseTraceMarkerAction) {
-        const marker = settings.markers?.[action]
-        if (marker === false) {
-            return undefined
-        }
-        return { ...defaultMouseTraceMarkers[action], ...marker }
+        return resolveTraceMarker(settings.markers?.[action], defaultMouseTraceMarkers[action])
     }
 
     return { drawRange, drawSegments, drawSegment, drawMarkers, drawMarker, fillBackground, getMarker, getEventPosition }
@@ -147,12 +144,5 @@ function clampIndex(value: number, min: number, max: number) {
         return min
     }
     return Math.min(max, Math.max(min, Math.trunc(value)))
-}
-
-function clampOpacity(value: number) {
-    if (!Number.isFinite(value)) {
-        return 0
-    }
-    return Math.min(1, Math.max(0, value))
 }
 

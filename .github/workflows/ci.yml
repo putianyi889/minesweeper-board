@@ -58,5 +58,8 @@ jobs:
       - name: Check and build Worker consumer
         run: npm run test:worker:build
 
+      - name: Build touch replay fixture
+        run: npm run test:touch:build
+
       - name: Build docs
         run: npm run docs:build

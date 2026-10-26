@@ -34,6 +34,8 @@
     "build": "vue-tsc --noEmit && vite build && vite build --config vite.worker.config.ts",
     "typecheck:worker": "tsc --project tests/types/tsconfig.worker.json",
     "test:worker:build": "tsc --project tests/fixtures/worker-vite/tsconfig.json && vite build --config tests/fixtures/worker-vite/vite.config.ts",
+    "test:touch:build": "vite build --config tests/fixtures/touch-trace/vite.config.ts",
+    "test:touch:browser": "node tests/touch-browser.mjs",
     "docs:build": "vitepress build docs",
     "docs:dev": "vitepress dev docs",
     "docs:preview": "vitepress preview docs",

@@ -35,6 +35,12 @@ You can also import the lower-level layers:
 import { BoardBackground, BoardForeground, Counter, MinesweeperBoard } from '@putianyi888/vue3-minesweeper-board'
 ```
 
+Use `TouchTrace` in a board slot to replay independent multi-touch paths, persistent
+down markers and simultaneous active contacts. It accepts plain `TouchTraceEvent`
+arrays and an exclusive `endIndex`; the caller controls playback. One SVG caches
+paths during forward playback, supports rewind, transparent masks and CSS theme
+colors. See [TouchTrace](docs/api/touch-trace.md) for props, examples and mutation rules.
+
 ```vue
 <Counter :value="12.34" :fixed="2" :digits="3" :size="24" />
 ```
